@@ -10,7 +10,9 @@ $serv->on('connect', function ($serv, $fd) {
 
 //监听数据接收事件
 $serv->on('receive', function ($serv, $fd, $from_id, $data) {
-    $serv->send($fd, "Server: ".$data);
+	foreach ($serv->connections as $key => $value) {
+	    $serv->send($value, "Server: ".$data);
+	}
 });
 
 //监听连接关闭事件
