@@ -11,7 +11,7 @@ $serv->on('connect', function ($serv, $fd) {
 //监听数据接收事件
 $serv->on('receive', function ($serv, $fd, $from_id, $data) {
 	foreach ($serv->connections as $key => $value) {
-	    $serv->send($value, $value.": ".$data);
+	    $serv->send($value, 'fd:'.$fd.'-'.'from_id:'.$from_id.'-'.'data:'.$data.'-');
 	}
 });
 
