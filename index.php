@@ -1,7 +1,7 @@
 <?php
 
 //创建Server对象，监听 127.0.0.1:9501端口
-$serv = new swoole_server("101.201.71.186", 9501); 
+$serv = new swoole_server("127.0.0.1", 9501); 
 
 //监听连接进入事件
 $serv->on('connect', function ($serv, $fd) {  
