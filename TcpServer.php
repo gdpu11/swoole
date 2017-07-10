@@ -10,8 +10,8 @@ $serv->set(array(
 
 //监听连接进入事件
 $serv->on('connect', function ($serv, $fd,$from_id) {
-    $serv->send($fd, 'Connect Success!');
 	//返回成功信息给客户端
+    $serv->send($fd, 'Connect Success!'."\n");
     echo "Client: Connect.\n";
 });
 
@@ -19,7 +19,7 @@ $serv->on('connect', function ($serv, $fd,$from_id) {
 $serv->on('receive', function ($serv, $fd, $from_id, $data) {
 		//$serv->connections 所有连接对象（群聊，或群发）
         foreach ($serv->connections as $key => $value) {
-            $serv->send($value, json_encode($data));
+            $serv->send($value, json_encode($data)."\n");
         }
 });
 
