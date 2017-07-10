@@ -11,15 +11,15 @@ $serv->set(array(
 //监听连接进入事件
 $serv->on('connect', function ($serv, $fd,$from_id) {
 	//返回成功信息给客户端
-    $serv->send($fd, 'Connect Success!');
     echo "Client: Connect.\n";
 });
 
 //监听数据接收事件
 $serv->on('receive', function ($serv, $fd, $from_id, $data) {
+	    $serv->send($fd, 'Connect Success!');
 		//$serv->connections 所有连接对象（群聊，或群发）
         foreach ($serv->connections as $key => $value) {
-            $serv->send($value, 'fd:'.$fd.'-'.'from_id:'.$from_id.'-'.'data:'.$data.'-');
+            $serv->send($value, json_encode($data));
         }
 });
 
