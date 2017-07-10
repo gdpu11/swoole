@@ -9,7 +9,7 @@ $serv->set(array(
 ));
 
 //监听连接进入事件
-$serv->on('connect', function ($serv, $fd) {
+$serv->on('connect', function ($serv, $fd,$from_id) {
 	//返回成功信息给客户端
     $serv->send($fd, 'Connect Success!');
     echo "Client: Connect.\n";
