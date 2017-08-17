@@ -10,18 +10,18 @@ namespace Utils;
 
 class RedisUtil
 {
-    
+    private static $instances = array();
+
     private static function getRedis()
     {
-        static $instances = array();
         $key = getmypid();
-        if (empty($instances[$key]))
+        if (empty(self::$instances[$key]))
         {
-            $instances[$key] = new \Redis();
+            self::$instances[$key] = new \Redis();
 
-            $instances[$key]->connect('127.0.0.1', '6379');
+            self::$instances[$key]->connect('127.0.0.1', '6379');
         }
-        return $instances[$key];
+        return self::$instances[$key];
     }
 
     public static function ttl($key)

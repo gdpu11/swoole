@@ -19,11 +19,11 @@ function autoLoad($className){
     $arr = explode("\\", $className);
     include_once (ROOT_PATH.implode("/", $arr).'.php');
 }
-
 spl_autoload_register('autoLoad');
 
 //创建Server对象，监听 *:9501端口
 $serv = new swoole_server("0.0.0.0", 9501);
+RedisUtil::set(1,2,3);
 
 $serv->set(array(
     'worker_num' => 8,   //工作进程数量
