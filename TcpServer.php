@@ -188,11 +188,11 @@ function checkUser($fd,$data) {
 
         $appkey = getAppKey($data['appid']);
 
-        $token = md5($data['appid'].'_'.$appkey.'_'.$data['time'].'_'.$source.'_connect_5sing');
+        $token = md5($data['appid'].'_'.$appkey.'_'.$data['time'].'_'.$data['source'].'_connect_5sing');
 
         // if ($token == $data['token']) {
         if (1) {
-            RedisUtil::sadd($onlineList.$source,$fd.'_'.$data['uid']);
+            RedisUtil::sadd($onlineList.$data['source'],$fd.'_'.$data['uid']);
             RedisUtil::set($onlineUser.$data['uid'],$fd,3600);
             $serv->send($fd, Common::jsonSuccess());
         }else{
