@@ -19,6 +19,7 @@ function autoLoad($className){
     $arr = explode("\\", $className);
     include_once (ROOT_PATH.implode("/", $arr).'.php');
 }
+
 spl_autoload_register('autoLoad');
 
 //创建Server对象，监听 *:9501端口
@@ -81,8 +82,13 @@ function connect($serv, $fd,$from_id) {
 }
 
 function receive($serv, $fd, $from_id, $data) {
+    $serv->send($fd, 'ddddd');
+    $serv->send($fd, $data."\n");
+    $serv->send($fd, Common::jsonError(10003)."\n");
+
     $data = json_decode($data);
-    if (checkUser($fd,$data)) {
+    if (0) {
+    // if (checkUser($fd,$data)) {
         switch (intval($data['type'])) {
 
             case 1://发送系统消息
