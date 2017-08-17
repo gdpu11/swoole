@@ -24,6 +24,11 @@ function autoLoad($className){
 }
 spl_autoload_register('autoLoad');
 
+
+$onlineList = '5sing_msg_online_list';
+$onlineUser = '5sing_msg_online_user_';
+
+
 //创建Server对象，监听 *:9501端口
 $serv = new swoole_server("0.0.0.0", 9501);
 
@@ -74,8 +79,7 @@ $sendUserMsg = array(
     'target'=>'1,2,3',//0:all,1:android,2:ios,3:pc
     );
 
-$onlineList = '5sing_msg_online_list';
-$onlineUser = '5sing_msg_online_user_';
+
 
 function connect($serv, $fd,$from_id) {
     //返回成功信息给客户端
@@ -86,14 +90,8 @@ function connect($serv, $fd,$from_id) {
 function receive($serv, $fd, $from_id, $data) {
     $data = json_decode($data);
 
-    $serv->send($fd, $data->type."\n");
-    $serv->send($fd, json_encode($data)."\n");
-
     $data = Common::objectToArray($data);
 
-    $serv->send($fd, json_encode($data)."\n");
-
-    $serv->send($fd, $data['type']."\n");
     if (checkUser($fd,$data)) {
         switch (intval($data['type'])) {
 
@@ -122,7 +120,7 @@ function sendToAll($serv,$data = array()) {
             'title'=>$data['title'],
             'content'=>$data['content'],
             );
-        $list = RedisUtil::smembers('5sing_msg_online_list'.$data['target']);
+        $list = RedisUtil::smembers($onlineList.$data['target']);
         switch (intval($data['target'])) {
             case 1:
                 foreach ($list as $key => $value) {
@@ -162,8 +160,8 @@ function sendToUsers($serv,$users = array(),$data = array()) {
         'content'=>$data['content'],
         );
     foreach ($users as $key => $value) {
-        if (RedisUtil::exists('5sing_msg_online_user_'.$value)) {
-            $fd = RedisUtil::get('5sing_msg_online_user_'.$value);
+        if (RedisUtil::exists($onlineUser.$value)) {
+            $fd = RedisUtil::get($onlineUser.$value);
             $serv->send($fd, json_encode($sendData));
         }
     }
@@ -180,7 +178,7 @@ function getAppKey($appid = 1) {
 
 function checkUser($fd,$data) {
     // if (isset($data['uid'])&&RedisUtil::sismember($onlineKey,$fd.'_'.$data['uid'])) {
-    if (isset($data['uid'])&&RedisUtil::exists('5sing_msg_online_user_'.$data['uid'])) {
+    if (isset($data['uid'])&&RedisUtil::exists($onlineUser.$data['uid'])) {
         return true;
     }else{
         if (count($data)<6 || !isset($data['source']) || !isset($data['uid']) || !isset($data['type']) || !isset($data['appid'])|| !isset($data['time'])|| !isset($data['token'])) {
@@ -193,8 +191,8 @@ function checkUser($fd,$data) {
 
         // if ($token == $data['token']) {
         if (1) {
-            RedisUtil::sadd('5sing_msg_online_list'.$data['source'],$fd.'_'.$data['uid']);
-            RedisUtil::set('5sing_msg_online_user_'.$data['uid'],$fd,3600);
+            RedisUtil::sadd($onlineList.$data['source'],$fd.'_'.$data['uid']);
+            RedisUtil::set($onlineUser.$data['uid'],$fd,3600);
             return true;
         }else{
             return false;
