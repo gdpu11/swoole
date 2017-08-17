@@ -83,7 +83,8 @@ function connect($serv, $fd,$from_id) {
 
 function receive($serv, $fd, $from_id, $data) {
     $data = json_decode($data);
-
+    $serv->send($fd, $data->type."\n");
+    Common::objToArr($data);
     $serv->send($fd, $data['type']."\n");
     if (checkUser($fd,$data)) {
         switch (intval($data['type'])) {

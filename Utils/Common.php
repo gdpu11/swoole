@@ -66,6 +66,26 @@ class Common
      * @param  array  $data    [description]
      * @return [type]          [description]
      */
+    public static function objToArr(&$arr) {
+        $array = array();
+        foreach ($arr as $key => $value) {
+            if (is_object($value)||is_array($value)) {
+                self::objToArr($arr[$key]);
+            }else{
+                $array[$key] = $value;
+            }
+        }
+        $array = $arr;
+    }
+    /**
+     * [outError 错误]
+     * @author qianglee@kugou.net
+     * @date   2017-04-26
+     * @param  [type] $code    [description]
+     * @param  string $message [description]
+     * @param  array  $data    [description]
+     * @return [type]          [description]
+     */
     public static function jsonError($code, $message='', $data=array()) {
         // 是否自定义错误消息
         if (!isset($message) || empty($message)) {
