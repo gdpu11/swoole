@@ -82,13 +82,8 @@ function connect($serv, $fd,$from_id) {
 }
 
 function receive($serv, $fd, $from_id, $data) {
-    $serv->send($fd, 'ddddd');
-    $serv->send($fd, $data."\n");
-    $serv->send($fd, Common::jsonError(10003)."\n");
-
     $data = json_decode($data);
-    if (0) {
-    // if (checkUser($fd,$data)) {
+    if (checkUser($fd,$data)) {
         switch (intval($data['type'])) {
 
             case 1://发送系统消息
