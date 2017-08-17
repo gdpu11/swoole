@@ -25,7 +25,7 @@ function autoLoad($className){
 spl_autoload_register('autoLoad');
 $key = 'a';
 $value = RedisUtil::incr($key);
-while ( $value <1000000) {
+while ( $value <100000) {
     RedisUtil::set($key.$value,$value);
     $value = RedisUtil::incr($key);
 }
