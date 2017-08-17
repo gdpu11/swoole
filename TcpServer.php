@@ -77,12 +77,7 @@ $sendUserMsg = array(
 $onlineList = '5sing_msg_online_list';
 $onlineUser = '5sing_msg_online_user_';
 
-function connect($serv, $fd,$from_id,$data) {
-
-    $data = json_decode($data);
-
-    $data = Common::objectToArray($data);
-    $serv->send($fd, json_encode($data)."\n");
+function connect($serv, $fd,$from_id) {
     //返回成功信息给客户端
     $serv->send($fd, 'Connect Success!'."\n");
     echo "Client: Connect.\n";
