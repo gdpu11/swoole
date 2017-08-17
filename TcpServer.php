@@ -182,7 +182,7 @@ function checkUser($fd,$data) {
     if (isset($data['uid'])&&RedisUtil::exists($onlineUser.$data['uid'])) {
         return true;
     }else{
-        if (count($data)<6 || isset($data['source']) || isset($data['uid']) || isset($data['type']) || !isset($data['appid'])|| !isset($data['time'])|| !isset($data['token'])) {
+        if (count($data)<6 || !isset($data['source']) || !isset($data['uid']) || !isset($data['type']) || !isset($data['appid'])|| !isset($data['time'])|| !isset($data['token'])) {
             return false;
         }
 
