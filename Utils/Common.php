@@ -75,7 +75,7 @@ class Common
             $data = array();
         }
         $res = array('code'=>$code, 'message'=>$message, 'success'=>false, 'data'=>$data);
-        self::outJson($res);
+        return self::outJson($res);
     }
 
     /**
@@ -87,7 +87,7 @@ class Common
      */
     public static function jsonSuccess($data=array()){
         $res = array('code'=>0,'message'=>'success', 'success'=>true,'data'=>$data);
-        self::outJson($res);
+        return self::outJson($res);
     }
 
     /**
