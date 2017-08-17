@@ -124,21 +124,21 @@ function sendToAll($connections = array(),$data = array()) {
             );
         switch (intval($data['target'])) {
             case 1:
-                foreach (RedisUtil::smembers($onlineList.$data['target']) as $key => $value) {
+                foreach (RedisUtil::smembers('5sing_msg_online_list'.$data['target']) as $key => $value) {
                     $value = explode('_', $value);
                     $value = $value[0];
                     $serv->send($value, json_encode($sendData));
                 }
                 break;
             case 2:
-                foreach (RedisUtil::smembers($onlineList.$data['target']) as $key => $value) {
+                foreach (RedisUtil::smembers('5sing_msg_online_list'.$data['target']) as $key => $value) {
                     $value = explode('_', $value);
                     $value = $value[0];
                     $serv->send($value, json_encode($sendData));
                 }
                 break;
             case 3:
-                foreach (RedisUtil::smembers($onlineList.$data['target']) as $key => $value) {
+                foreach (RedisUtil::smembers('5sing_msg_online_list'.$data['target']) as $key => $value) {
                     $value = explode('_', $value);
                     $value = $value[0];
                     $serv->send($value, json_encode($sendData));
@@ -161,8 +161,8 @@ function sendToUsers($users = array(),$data = array()) {
         'content'=>$data['content'],
         );
     foreach ($users as $key => $value) {
-        if (RedisUtil::exists($onlineUser.$value)) {
-            $fd = RedisUtil::get($onlineUser.$value);
+        if (RedisUtil::exists('5sing_msg_online_user_'.$value)) {
+            $fd = RedisUtil::get('5sing_msg_online_user_'.$value);
             $serv->send($fd, json_encode($sendData));
         }
     }
@@ -179,7 +179,7 @@ function getAppKey($appid = 1) {
 
 function checkUser($fd,$data) {
     // if (isset($data['uid'])&&RedisUtil::sismember($onlineKey,$fd.'_'.$data['uid'])) {
-    if (isset($data['uid'])&&RedisUtil::exists($onlineUser.$data['uid'])) {
+    if (isset($data['uid'])&&RedisUtil::exists('5sing_msg_online_user_'.$data['uid'])) {
         return true;
     }else{
         if (count($data)<6 || !isset($data['source']) || !isset($data['uid']) || !isset($data['type']) || !isset($data['appid'])|| !isset($data['time'])|| !isset($data['token'])) {
@@ -192,8 +192,8 @@ function checkUser($fd,$data) {
 
         // if ($token == $data['token']) {
         if (1) {
-            RedisUtil::sadd($onlineList.$data['source'],$fd.'_'.$data['uid']);
-            RedisUtil::set($onlineUser.$data['uid'],$fd,3600);
+            RedisUtil::sadd('5sing_msg_online_list'.$data['source'],$fd.'_'.$data['uid']);
+            RedisUtil::set('5sing_msg_online_user_'.$data['uid'],$fd,3600);
             $serv->send($fd, Common::jsonSuccess());
         }else{
             return false;
