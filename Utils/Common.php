@@ -98,8 +98,8 @@ class Common
     protected static function outJson($data = null)
     {
         header('Content-type: application/json; charset='.PAGE_CHARSET);
-        echo json_encode($data);
-        exit();
+        return json_encode($data);
+        // exit();
     }
     /**
      * [_getErrorMsg 获取错误信息]

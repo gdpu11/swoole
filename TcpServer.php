@@ -99,7 +99,7 @@ function receive($serv, $fd, $from_id, $data) {
                 break;
         }
     }else{
-        Common::jsonError(10003);
+        $serv->send($fd, Common::jsonError(10003));
     }
     
 }
