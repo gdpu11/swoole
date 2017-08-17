@@ -2,6 +2,9 @@
 use Utils\RedisUtil;
 use Utils\Common;
 
+ini_set("display_errors", "On");
+error_reporting(E_ALL | E_STRICT);
+
 if ('\\' === DIRECTORY_SEPARATOR) // Windows 环境下
     define('ROOT_PATH', strtr(__DIR__, DIRECTORY_SEPARATOR, '/') . '/');
 else
@@ -23,7 +26,6 @@ spl_autoload_register('autoLoad');
 
 //创建Server对象，监听 *:9501端口
 $serv = new swoole_server("0.0.0.0", 9501);
-RedisUtil::set(1,2);
 
 $serv->set(array(
     'worker_num' => 8,   //工作进程数量
@@ -75,13 +77,13 @@ $sendUserMsg = array(
 $onlineList = '5sing_msg_online_list';
 $onlineUser = '5sing_msg_online_user_';
 
-function connect($serv, $fd,$from_id) {
+public static function connect($serv, $fd,$from_id) {
     //返回成功信息给客户端
     $serv->send($fd, 'Connect Success!'."\n");
     echo "Client: Connect.\n";
 }
 
-function receive($serv, $fd, $from_id, $data) {
+public static function receive($serv, $fd, $from_id, $data) {
     $data = json_decode($data);
     $serv->send($fd, $data->type."\n");
     $data = Common::objectToArray($data);
@@ -108,7 +110,7 @@ function receive($serv, $fd, $from_id, $data) {
     
 }
 
-function sendToAll($connections = array(),$data = array()) {
+public static function sendToAll($connections = array(),$data = array()) {
         $sendData = array(
             'type'=>1,
             'title'=>$data['title'],
@@ -146,7 +148,7 @@ function sendToAll($connections = array(),$data = array()) {
         
 }
 
-function sendToUsers($users = array(),$data = array()) {
+public static function sendToUsers($users = array(),$data = array()) {
     $sendData = array(
         'type'=>2,
         'title'=>$data['title'],
@@ -161,7 +163,7 @@ function sendToUsers($users = array(),$data = array()) {
 }
 
 
-function getAppKey($appid = 1) {
+public static function getAppKey($appid = 1) {
     $appkeyArr = array(
         0=>0,
         1=>1,
@@ -169,7 +171,7 @@ function getAppKey($appid = 1) {
     return $appkeyArr[$appid];
 }
 
-function checkUser($fd,$data) {
+public static function checkUser($fd,$data) {
     // if (isset($data['uid'])&&RedisUtil::sismember($onlineKey,$fd.'_'.$data['uid'])) {
     if (isset($data['uid'])&&RedisUtil::exists($onlineUser.$data['uid'])) {
         return true;
@@ -194,7 +196,7 @@ function checkUser($fd,$data) {
 
 }
 
-function clientClose($serv, $fd) {
+public static function clientClose($serv, $fd) {
     echo "Client: Close.\n";
 }
 //启动服务器
