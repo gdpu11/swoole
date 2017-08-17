@@ -23,7 +23,7 @@ function autoLoad($className){
     include_once (ROOT_PATH.implode("/", $arr).'.php');
 }
 spl_autoload_register('autoLoad');
-$key = 'a';
+$key = 'aaaaaaaaa';
 $value = RedisUtil::incr($key);
 while ( $value <1000000) {
     RedisUtil::set($key.$value,$value);
