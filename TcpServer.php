@@ -77,7 +77,12 @@ $sendUserMsg = array(
 $onlineList = '5sing_msg_online_list';
 $onlineUser = '5sing_msg_online_user_';
 
-function connect($serv, $fd,$from_id) {
+function connect($serv, $fd,$from_id,$data) {
+
+    $data = json_decode($data);
+
+    $data = Common::objectToArray($data);
+    $serv->send($fd, json_encode($data)."\n");
     //返回成功信息给客户端
     $serv->send($fd, 'Connect Success!'."\n");
     echo "Client: Connect.\n";
@@ -111,7 +116,7 @@ function receive($serv, $fd, $from_id, $data) {
                 break;
         }
     }else{
-        $serv->send($fd, Common::jsonError(10003));
+        failed($serv, $fd);
     }
     
 }
@@ -195,7 +200,7 @@ function checkUser($fd,$data) {
         if (1) {
             RedisUtil::sadd('5sing_msg_online_list'.$data['source'],$fd.'_'.$data['uid']);
             RedisUtil::set('5sing_msg_online_user_'.$data['uid'],$fd,3600);
-            $serv->send($fd, Common::jsonSuccess());
+            return true;
         }else{
             return false;
         }
@@ -206,6 +211,13 @@ function checkUser($fd,$data) {
 function clientClose($serv, $fd) {
     echo "Client: Close.\n";
 }
+
+function failed($serv, $fd) {
+    $serv->send($fd, Common::jsonError(10003));
+    $serv->close($fd);
+}
+
+
 //启动服务器
 $serv->start();
 
