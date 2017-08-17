@@ -91,9 +91,9 @@ function receive($serv, $fd, $from_id, $data) {
             
             case 2://
                 $users = explode(',', $data['target']);
-                sendToUsers($users)
+                sendToUsers($users);
                 break;
-            
+
             default:
                 # code...
                 break;
