@@ -58,7 +58,7 @@ class Common
     }
 
     /**
-     * [outError 错误]
+     * [objectToArray 对象转为数组]
      * @author qianglee@kugou.net
      * @date   2017-04-26
      * @param  [type] $code    [description]
@@ -66,16 +66,16 @@ class Common
      * @param  array  $data    [description]
      * @return [type]          [description]
      */
-    public static function objToArr(&$arr) {
-        $array = array();
-        foreach ($arr as $key => $value) {
-            if (is_object($value)||is_array($value)) {
-                self::objToArr($arr[$key]);
-            }else{
-                $array[$key] = $value;
-            }
-        }
-        $array = $arr;
+    public static function objectToArray($array) {  
+        if(is_object($array)) {  
+            $array = (array)$array;  
+        } 
+        if(is_array($array)) {  
+            foreach($array as $key=>$value) {  
+                $array[$key] = self::object_array($value);  
+            }  
+        }  
+        return $array;  
     }
     /**
      * [outError 错误]
