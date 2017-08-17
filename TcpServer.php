@@ -183,7 +183,7 @@ function checkUser($fd,$data) {
         if (1) {
             RedisUtil::sadd($onlineList.$source,$fd.'_'.$data['uid']);
             RedisUtil::set($onlineUser.$data['uid'],$fd,3600);
-            Common::jsonSuccess();
+            $serv->send($fd, Common::jsonSuccess());
         }else{
             return false;
         }
