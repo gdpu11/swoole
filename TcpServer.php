@@ -77,16 +77,19 @@ $sendUserMsg = array(
 $onlineList = '5sing_msg_online_list';
 $onlineUser = '5sing_msg_online_user_';
 
-public static function connect($serv, $fd,$from_id) {
+function connect($serv, $fd,$from_id) {
     //返回成功信息给客户端
     $serv->send($fd, 'Connect Success!'."\n");
     echo "Client: Connect.\n";
 }
 
-public static function receive($serv, $fd, $from_id, $data) {
+function receive($serv, $fd, $from_id, $data) {
     $data = json_decode($data);
+    
     $serv->send($fd, $data->type."\n");
+
     $data = Common::objectToArray($data);
+
     $serv->send($fd, $data['type']."\n");
     if (checkUser($fd,$data)) {
         switch (intval($data['type'])) {
@@ -110,7 +113,7 @@ public static function receive($serv, $fd, $from_id, $data) {
     
 }
 
-public static function sendToAll($connections = array(),$data = array()) {
+function sendToAll($connections = array(),$data = array()) {
         $sendData = array(
             'type'=>1,
             'title'=>$data['title'],
@@ -148,7 +151,7 @@ public static function sendToAll($connections = array(),$data = array()) {
         
 }
 
-public static function sendToUsers($users = array(),$data = array()) {
+function sendToUsers($users = array(),$data = array()) {
     $sendData = array(
         'type'=>2,
         'title'=>$data['title'],
@@ -163,7 +166,7 @@ public static function sendToUsers($users = array(),$data = array()) {
 }
 
 
-public static function getAppKey($appid = 1) {
+function getAppKey($appid = 1) {
     $appkeyArr = array(
         0=>0,
         1=>1,
@@ -171,7 +174,7 @@ public static function getAppKey($appid = 1) {
     return $appkeyArr[$appid];
 }
 
-public static function checkUser($fd,$data) {
+function checkUser($fd,$data) {
     // if (isset($data['uid'])&&RedisUtil::sismember($onlineKey,$fd.'_'.$data['uid'])) {
     if (isset($data['uid'])&&RedisUtil::exists($onlineUser.$data['uid'])) {
         return true;
@@ -196,7 +199,7 @@ public static function checkUser($fd,$data) {
 
 }
 
-public static function clientClose($serv, $fd) {
+function clientClose($serv, $fd) {
     echo "Client: Close.\n";
 }
 //启动服务器

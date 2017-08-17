@@ -66,16 +66,9 @@ class Common
      * @param  array  $data    [description]
      * @return [type]          [description]
      */
-    public static function objectToArray($array) {  
-        if(is_object($array)) {  
-            $array = (array)$array;  
-        } 
-        if(is_array($array)) {  
-            foreach($array as $key=>$value) {  
-                $array[$key] = self::object_array($value);  
-            }  
-        }  
-        return $array;  
+    public static function objectToArray(&$object) {
+             $object =  json_decode( json_encode( $object),true);
+             return  $object;
     }
     /**
      * [outError 错误]
