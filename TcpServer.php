@@ -85,10 +85,13 @@ function connect($serv, $fd,$from_id) {
 
 function receive($serv, $fd, $from_id, $data) {
     $data = json_decode($data);
-    
+
     $serv->send($fd, $data->type."\n");
+    $serv->send($fd, json_encode($data)."\n");
 
     $data = Common::objectToArray($data);
+
+    $serv->send($fd, json_encode($data)."\n");
 
     $serv->send($fd, $data['type']."\n");
     if (checkUser($fd,$data)) {
