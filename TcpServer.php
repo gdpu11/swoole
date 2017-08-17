@@ -98,16 +98,16 @@ function receive($serv, $fd, $from_id, $data) {
         switch (intval($data['type'])) {
 
             case 1://发送系统消息
-                sendToAll($serv->connections,$data);
+                sendToAll($serv,$data);
                 break;
             
             case 2://
                 $users = explode(',', $data['target']);
-                sendToUsers($users);
+                sendToUsers($serv,$users,$data);
                 break;
 
             default:
-                sendToAll($serv->connections,$data);
+                sendToAll($serv,$data);
                 break;
         }
     }else{
@@ -116,29 +116,30 @@ function receive($serv, $fd, $from_id, $data) {
     
 }
 
-function sendToAll($connections = array(),$data = array()) {
+function sendToAll($serv,$data = array()) {
         $sendData = array(
             'type'=>1,
             'title'=>$data['title'],
             'content'=>$data['content'],
             );
+        $list = RedisUtil::smembers('5sing_msg_online_list'.$data['target']);
         switch (intval($data['target'])) {
             case 1:
-                foreach (RedisUtil::smembers('5sing_msg_online_list'.$data['target']) as $key => $value) {
+                foreach ($list as $key => $value) {
                     $value = explode('_', $value);
                     $value = $value[0];
                     $serv->send($value, json_encode($sendData));
                 }
                 break;
             case 2:
-                foreach (RedisUtil::smembers('5sing_msg_online_list'.$data['target']) as $key => $value) {
+                foreach ($list as $key => $value) {
                     $value = explode('_', $value);
                     $value = $value[0];
                     $serv->send($value, json_encode($sendData));
                 }
                 break;
             case 3:
-                foreach (RedisUtil::smembers('5sing_msg_online_list'.$data['target']) as $key => $value) {
+                foreach ($list as $key => $value) {
                     $value = explode('_', $value);
                     $value = $value[0];
                     $serv->send($value, json_encode($sendData));
@@ -146,7 +147,7 @@ function sendToAll($connections = array(),$data = array()) {
                 break;
             
             default:
-                foreach ($connections as $key => $value) {
+                foreach ($serv->connections as $key => $value) {
                     $serv->send($value, json_encode($sendData));
                 }
                 break;
@@ -154,7 +155,7 @@ function sendToAll($connections = array(),$data = array()) {
         
 }
 
-function sendToUsers($users = array(),$data = array()) {
+function sendToUsers($serv,$users = array(),$data = array()) {
     $sendData = array(
         'type'=>2,
         'title'=>$data['title'],
