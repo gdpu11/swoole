@@ -26,7 +26,7 @@ function autoLoad($className){
 spl_autoload_register('autoLoad');
 
 
-Swoole::initSwoole();/*
+Swoole::initTcpServer();/*
 
 
 //创建Server对象，监听 *:9501端口
@@ -76,7 +76,7 @@ $sendUserMsg = array(
     'type'=>1,
     'title'=>'title',
     'content'=>'content',
-    'target'=>'1,2,3',//0:all,1:android,2:ios,3:pc
+    'target'=>'1,2,3',//0:all,1:android,2:ios,3:pc,字符串：用户id
     );
 
 $onlineList = '5sing_msg_online_list';

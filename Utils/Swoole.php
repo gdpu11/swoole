@@ -11,9 +11,11 @@ use Utils\RedisUtil;
 use Utils\Common;
 class Swoole
 {
-    private static $instances = array();
 
-    public static function initSwoole()
+    private static $onlineList = '5_m_o_l';//5sing_msg_online_list
+    private static $onlineUser = '5_m_o_u_';//5sing_msg_online_user_
+
+    public static function initTcpServer()
     {
         $serv = new \swoole_server("0.0.0.0", 9501);
 
@@ -32,22 +34,12 @@ class Swoole
             self::receive($serv, $fd, $from_id, $data);
         });
         //监听连接关闭事件
-        $serv->on('close', function($serv, $fd) {
-            self::clientClose($serv, $fd);
+        $serv->on('close', function($serv, $fd, $from_id, $data) {
+            self::clientClose($serv, $fd, $from_id, $data);
         });
         //启动服务器
         $serv->start();
 
-        return $serv;
-    }
-
-    public static function getServer()
-    {
-        if (empty(self::$instances))
-        {
-            self::$instances = self::initSwoole();
-        }
-        return self::$instances;
     }
 
     public static function connect($serv, $fd,$from_id) {
@@ -65,20 +57,20 @@ class Swoole
             switch (intval($data['type'])) {
 
                 case 1://发送系统消息
-                    sendToAll($data);
+                    sendToAll($serv,$data);
                     break;
                 
                 case 2://
                     $users = explode(',', $data['target']);
-                    sendToUsers($users,$data);
+                    sendToUsers($serv,$users,$data);
                     break;
 
                 default:
-                    sendToAll($data);
+                    sendToAll($serv,$data);
                     break;
             }
         }else{
-            failed( $fd);
+            failed($serv, $fd);
         }
         
     }
@@ -87,14 +79,13 @@ class Swoole
         echo "Client: Close.\n";
     }
 
-    public static function sendToAll($data = array()) {
-        $serv = self::getServer();
+    public static function sendToAll($serv,$data = array()) {
             $sendData = array(
                 'type'=>1,
                 'title'=>$data['title'],
                 'content'=>$data['content'],
                 );
-            $list = RedisUtil::smembers('5sing_msg_online_list'.$data['target']);
+            $list = RedisUtil::smembers(self::$onlineList.$data['target']);
             switch (intval($data['target'])) {
                 case 1:
                     foreach ($list as $key => $value) {
@@ -127,16 +118,15 @@ class Swoole
             
     }
 
-    public static function sendToUsers($users = array(),$data = array()) {
-        $serv = self::getServer();
+    public static function sendToUsers($serv,$users = array(),$data = array()) {
         $sendData = array(
             'type'=>2,
             'title'=>$data['title'],
             'content'=>$data['content'],
             );
         foreach ($users as $key => $value) {
-            if (RedisUtil::exists('5sing_msg_online_user_'.$value)) {
-                $fd = RedisUtil::get('5sing_msg_online_user_'.$value);
+            if (RedisUtil::exists(self::$onlineUser.$value)) {
+                $fd = RedisUtil::get(self::$onlineUser.$value);
                 $serv->send($fd, json_encode($sendData));
             }
         }
@@ -153,7 +143,7 @@ class Swoole
 
     public static function checkUser($fd,$data) {
         // if (isset($data['uid'])&&RedisUtil::sismember($onlineKey,$fd.'_'.$data['uid'])) {
-        if (isset($data['uid'])&&RedisUtil::exists('5sing_msg_online_user_'.$data['uid'])) {
+        if (isset($data['uid'])&&RedisUtil::exists(self::$onlineUser.$data['uid'])) {
             return true;
         }else{
             if (count($data)<6 || !isset($data['source']) || !isset($data['uid']) || !isset($data['type']) || !isset($data['appid'])|| !isset($data['time'])|| !isset($data['token'])) {
@@ -166,18 +156,16 @@ class Swoole
 
             // if ($token == $data['token']) {
             if (1) {
-                RedisUtil::sadd('5sing_msg_online_list'.$data['source'],$fd.'_'.$data['uid']);
-                RedisUtil::set('5sing_msg_online_user_'.$data['uid'],$fd,3600);
+                RedisUtil::sadd(self::$onlineList.$data['source'],$fd.'_'.$data['uid']);
+                RedisUtil::set(self::$onlineUser.$data['uid'],$fd,3600);
                 return true;
             }else{
                 return false;
             }
         }
-
     }
 
-    public static function failed($fd) {
-        $serv = self::getServer();
+    public static function failed($serv, $fd) {
         $serv->send($fd, Common::jsonError(10003));
         $serv->close($fd);
     }
