@@ -23,14 +23,18 @@ class Swoole
         ));
 
         //监听连接进入事件
-        $serv->on('connect', array($this, 'connect'));
+        $serv->on('connect', function($serv, $fd,$from_id) {
+            self::connect($serv, $fd,$from_id);
+        });
 
         //监听数据接收事件
-        $serv->on('receive', array($this, 'receive'));
-
+        $serv->on('receive', function($serv, $fd, $from_id, $data) {
+            self::receive($serv, $fd, $from_id, $data);
+        });
         //监听连接关闭事件
-        $serv->on('close', array($this, 'clientClose'));
-
+        $serv->on('close', function($serv, $fd) {
+            self::clientClose($serv, $fd);
+        });
         //启动服务器
         $serv->start();
 
@@ -61,25 +65,30 @@ class Swoole
             switch (intval($data['type'])) {
 
                 case 1://发送系统消息
-                    sendToAll($serv,$data);
+                    sendToAll($data);
                     break;
                 
                 case 2://
                     $users = explode(',', $data['target']);
-                    sendToUsers($serv,$users,$data);
+                    sendToUsers($users,$data);
                     break;
 
                 default:
-                    sendToAll($serv,$data);
+                    sendToAll($data);
                     break;
             }
         }else{
-            failed($serv, $fd);
+            failed( $fd);
         }
         
     }
 
-    public static function sendToAll($serv,$data = array()) {
+    public static function clientClose($serv, $fd) {
+        echo "Client: Close.\n";
+    }
+
+    public static function sendToAll($data = array()) {
+        $serv = self::getServer();
             $sendData = array(
                 'type'=>1,
                 'title'=>$data['title'],
@@ -118,7 +127,8 @@ class Swoole
             
     }
 
-    public static function sendToUsers($serv,$users = array(),$data = array()) {
+    public static function sendToUsers($users = array(),$data = array()) {
+        $serv = self::getServer();
         $sendData = array(
             'type'=>2,
             'title'=>$data['title'],
@@ -166,11 +176,8 @@ class Swoole
 
     }
 
-    public static function clientClose($serv, $fd) {
-        echo "Client: Close.\n";
-    }
-
-    public static function failed($serv, $fd) {
+    public static function failed($fd) {
+        $serv = self::getServer();
         $serv->send($fd, Common::jsonError(10003));
         $serv->close($fd);
     }
