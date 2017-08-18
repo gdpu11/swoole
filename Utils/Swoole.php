@@ -15,7 +15,7 @@ class Swoole
 
     public static function initSwoole()
     {
-        $serv = new swoole_server("0.0.0.0", 9501);
+        $serv = new \swoole_server("0.0.0.0", 9501);
 
         $serv->set(array(
             'worker_num' => 8,   //工作进程数量
