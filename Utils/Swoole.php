@@ -23,13 +23,13 @@ class Swoole
         ));
 
         //监听连接进入事件
-        $serv->on('connect', array(self, 'connect'));
+        $serv->on('connect', array($this, 'connect'));
 
         //监听数据接收事件
-        $serv->on('receive', array(self, 'receive'));
+        $serv->on('receive', array($this, 'receive'));
 
         //监听连接关闭事件
-        $serv->on('close', array(self, 'clientClose'));
+        $serv->on('close', array($this, 'clientClose'));
 
         //启动服务器
         $serv->start();
