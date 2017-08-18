@@ -9,6 +9,7 @@
 namespace Utils;
 use Utils\RedisUtil;
 use Utils\Common;
+
 class Swoole
 {
 
@@ -57,20 +58,20 @@ class Swoole
             switch (intval($data['type'])) {
 
                 case 1://发送系统消息
-                    sendToAll($serv,$data);
+                    self::sendToAll($serv,$data);
                     break;
                 
                 case 2://
                     $users = explode(',', $data['target']);
-                    sendToUsers($serv,$users,$data);
+                    self::sendToUsers($serv,$users,$data);
                     break;
 
                 default:
-                    sendToAll($serv,$data);
+                    self::sendToAll($serv,$data);
                     break;
             }
         }else{
-            failed($serv, $fd);
+            self::failed($serv, $fd);
         }
         
     }
@@ -150,7 +151,7 @@ class Swoole
                 return false;
             }
 
-            $appkey = getAppKey($data['appid']);
+            $appkey = self::getAppKey($data['appid']);
 
             $token = md5($data['appid'].'_'.$appkey.'_'.$data['time'].'_'.$data['source'].'_connect_5sing');
 
