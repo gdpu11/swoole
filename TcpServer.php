@@ -1,6 +1,7 @@
 <?php
 use Utils\RedisUtil;
 use Utils\Common;
+use Utils\Swoole;
 
 ini_set("display_errors", "On");
 error_reporting(E_ALL | E_STRICT);
@@ -23,6 +24,10 @@ function autoLoad($className){
     include_once (ROOT_PATH.implode("/", $arr).'.php');
 }
 spl_autoload_register('autoLoad');
+
+
+Swoole::initSwoole();/*
+
 
 //创建Server对象，监听 *:9501端口
 $serv = new swoole_server("0.0.0.0", 9501);
@@ -85,7 +90,7 @@ function connect($serv, $fd,$from_id) {
 
 function receive($serv, $fd, $from_id, $data) {
     $data = json_decode($data);
-    
+
     $data = Common::objectToArray($data);
 
     if (checkUser($fd,$data)) {
@@ -208,6 +213,6 @@ function failed($serv, $fd) {
 
 
 //启动服务器
-$serv->start();
+$serv->start();*/
 
 ?>
