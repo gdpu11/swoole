@@ -7,8 +7,7 @@
 *   @date        2017-5-11
 */
 namespace Utils;
-use Utils\RedisUtil;
-use Utils\Common;
+
 
 class Swoole
 {
@@ -54,7 +53,7 @@ class Swoole
         
         $data = Common::objectToArray($data);
 
-        if (checkUser($fd,$data)) {
+        if (self::checkUser($fd,$data)) {
             switch (intval($data['type'])) {
 
                 case 1://发送系统消息
