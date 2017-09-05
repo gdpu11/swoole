@@ -1,5 +1,7 @@
 <?php
 namespace DB;
+use Utils\Common;
+use Utils\ArrayUtil;
 
 class PdoOperateBase
 {
@@ -135,7 +137,7 @@ class PdoOperateBase
      * @param  [type] $SCHEMA [表结构]
      * @return [type]         [一行记录]
      */
-    public static function getOne($where,$fields=array()) {
+    public static function getOne($where,$fields=array(),$ifCache =1) {
         if (empty($where)) {
             return false;
         }
@@ -143,11 +145,17 @@ class PdoOperateBase
         $tbName = self::_getTableName($where);
         $fields = self::_getFieldsStr($fields);
         $whe = self::_getWhereFields($where);
-        $sql = "SELECT {$fields} FROM {$tbName} {$whe}";
-        if (isset($_GET['showSql'])&&$_GET['showSql']=='sql') {
-            echo $sql;
-            print_r($where);
+
+        $CacheKey = $tbName.'ONE:'.md5($tbName.$fields.$whe.implode('', array_keys($where)).implode('', ArrayUtil::getArrayColumn($where,'value')));
+        if ($ifCache) {
+            $one = Common::getRedisByKey($CacheKey);
+            if ($one) {
+                return $one;
+            }
         }
+
+        $sql = "SELECT {$fields} FROM {$tbName} {$whe}";
+        
         $pdo = self::getInstance();
         $ps = $pdo->prepare($sql);
         foreach ($where as $key => $value) {    
@@ -158,7 +166,11 @@ class PdoOperateBase
             }
         }
         $ps->execute();
-        return $ps->fetch(\PDO::FETCH_ASSOC);
+        $one = $ps->fetch(\PDO::FETCH_ASSOC);
+        if ($ifCache&&$one) {
+            Common::setRedisByKey($CacheKey,$one);
+        }
+        return $one;
     }
 
     /**
@@ -170,12 +182,20 @@ class PdoOperateBase
      * @param  [type] $SCHEMA [表结构]
      * @return [type]          [description]
      */
-    public static function getAll($where = array(),$page=1,$pageszie=20,$fields = array()) {
+    public static function getAll($where = array(),$page=1,$pageszie=20,$fields = array(),$ifCache = 1) {
         self::getTbFields();
         $tbName = self::_getTableName($where);
         $fields = self::_getFieldsStr($fields);
         $whe = self::_getWhereFields($where);
         $page = intval($page-1)*$pageszie;
+
+        $CacheKey = $tbName.'_ALL:'.md5($tbName.'_'.$fields.'_'.$whe.'_'.$page.'_'.$pageszie.'_'.implode('', array_keys($where)).'_'.implode('', ArrayUtil::getArrayColumn($where,'value')));
+        if ($ifCache) {
+            $all = Common::getRedisByKey($CacheKey);
+            if ($all) {
+                return $all;
+            }
+        }
         $sql = "SELECT {$fields} FROM {$tbName} {$whe} limit {$page},{$pageszie}";
         $pdo = self::getInstance();
         $ps = $pdo->prepare($sql);
@@ -187,7 +207,11 @@ class PdoOperateBase
             }
         }
         $ps->execute();
-        return $ps->fetchAll(\PDO::FETCH_ASSOC);
+        $all = $ps->fetchAll(\PDO::FETCH_ASSOC);
+        if ($ifCache&&$all) {
+            Common::setRedisByKey($CacheKey,$all);
+        }
+        return $all;
     }
     /**
      * 获取记录总数
@@ -379,11 +403,24 @@ class PdoOperateBase
                                 if (is_numeric($key1)) {
                                     $whe .= " AND {$key} = :{$key}".$i;//$where['status'] = array(0);
                                 }else{
-                                    $whe .= " AND {$key} {$key1} :{$key}".$i;//$where['status'] = array('!='=>0);
+                                    if (stripos('xlikex',$key1)) {
+                                        $whe .= " AND {$key} like :{$key}".$i;//$where['status'] = array('like'=>0);
+                                    }else{
+                                        $whe .= " AND {$key} {$key1} :{$key}".$i;//$where['status'] = array('!='=>0);
+                                    }
                                 }  
                             }
-                            if (strtolower($key1)=='like') {
-                                $value1 = '%'.$value1.'%';//$where['status'] = array('like'=>0);
+                            if (strtolower($key1)=='xlikex') {
+                                $value1 = '%'.$value1.'%';//$where['status'] = array('%like%'=>0);
+                            }
+                            elseif (strtolower($key1)=='likex') {
+                                $value1 = $value1.'%';//$where['status'] = array('like%'=>0);
+                            }
+                            elseif (strtolower($key1)=='xlike') {
+                                $value1 = '%'.$value1;//$where['status'] = array('%like'=>0);
+                            }
+                            elseif (strtolower($key1)=='like') {
+                                $value1 = '%'.$value1.'%';//$where['status'] = array('%like'=>0);
                             }
                             $bindValue[':'.$key.$i]['type'] = self::$DB_FIELDS[$tbName][$key];
                             $bindValue[':'.$key.$i++]['value'] = $value1;
