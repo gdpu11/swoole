@@ -27,7 +27,7 @@ class Join
 		ali::add($one);
 		print_r(ali::getSums($one,'hot'));
 		print_r(ali::getCount());
-		print_r(ali::getAll());
+		print_r(ali::getAll(array(),1,20,array(),0));
 		ali::delete($one);
 		// ali::setTbFields();
 		// ali::ifTbField();
