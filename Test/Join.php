@@ -12,7 +12,9 @@ class Join
 
 
 	//php G:\nginx\swoole\cli.php Test getAliCli
-	public static function getAliCli(){
+	public static function getAli(){
+		ini_set("display_errors", "On");
+		error_reporting(E_ALL | E_STRICT);
 		$one = array(
 			'id'=>123456,
 			'company'=>1,
