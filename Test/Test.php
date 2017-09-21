@@ -39,6 +39,7 @@ class Test
 		exit();
 	}
 	public static function zidian(){
+		$return = self::splicChn('原标题：跳楼产妇母亲：医院血口喷人！我怎么可能让女儿痛到寻死！主治医生已停职配合调查');
 		$return = self::splicChn('既可以像最大熵模型一样加各种领域国内通过发行代币形式包括首次代币发行（ICO）进行融资的活动大量涌现');
 		// $return = self::splicChn('既可以像最大熵模型一样加各种领域');
 		$return = self::splicChn('南京市长江大桥');
