@@ -14,7 +14,7 @@ class Join
 	//php G:\nginx\swoole\cli.php Test getAliCli
 	public static function getAliCli(){
 		$one = array(
-			'id'=>1,
+			'id'=>123456,
 			'company'=>1,
 			'name'=>1,
 			'hot'=>1,
