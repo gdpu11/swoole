@@ -32,7 +32,7 @@ $http->on('request', function ($request, $response) {
     // print_r($request->header);
     // print_r($request->server);
     $_GET = $request->get;
-    
+
     // $response->cookie("User", "Swoole");
     // $response->header("X-Server", "Swoole");
     // $response->end("<h1>Hello Swoole!</h1>");
@@ -48,7 +48,7 @@ $http->on('request', function ($request, $response) {
         echo 'what???';exit();
     }
 
-    $response->end($result);
+    $response->end(json_encode($result));
     // $response->end("<h1>Hello Swoole. #".rand(1000, 9999)."</h1>");
 });
 $http->start();
