@@ -158,6 +158,9 @@ class PdoOperateBase
         
         $pdo = self::getInstance();
         $ps = $pdo->prepare($sql);
+        if (isset($_GET['showSql'])&&$_GET['showSql']=='sql') {
+            echo $sql;
+        }
         foreach ($where as $key => $value) {    
             if ($value['type'] == 'varchar') {
                 $ps->bindValue($key, $value['value'], \PDO::PARAM_STR);
@@ -199,6 +202,9 @@ class PdoOperateBase
         $sql = "SELECT {$fields} FROM {$tbName} {$whe} limit {$page},{$pageszie}";
         $pdo = self::getInstance();
         $ps = $pdo->prepare($sql);
+        if (isset($_GET['showSql'])&&$_GET['showSql']=='sql') {
+            echo $sql;
+        }
         foreach ($where as $key => $value) {    
             if ($value['type'] == 'varchar') {
                 $ps->bindValue($key, $value['value'], \PDO::PARAM_STR);
