@@ -12,6 +12,11 @@ class Join
 
 
 	//php G:\nginx\swoole\cli.php Test getAliCli
+	public static function http(){
+
+		return (ali::getAll(array(),1,20,array(),0));
+		
+	}
 	public static function getAli(){
 		ini_set("display_errors", "On");
 		error_reporting(E_ALL | E_STRICT);
