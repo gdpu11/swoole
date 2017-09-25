@@ -25,6 +25,18 @@ spl_autoload_register('autoLoad');
 
 $http = new swoole_http_server("127.0.0.1", 9517);
 $http->on('request', function ($request, $response) {
+    print_r($request->get);
+    // print_r($request->post);
+    // print_r($request->cookie);
+    // print_r($request->files);
+    // print_r($request->header);
+    // print_r($request->server);
+    $_GET = $request->get;
+    
+    // $response->cookie("User", "Swoole");
+    // $response->header("X-Server", "Swoole");
+    // $response->end("<h1>Hello Swoole!</h1>");
+
     $g = isset($_GET['g']) ? ucfirst($_GET['g']) : 'User';
     $c = isset($_GET['c']) ? ucfirst($_GET['c']) : 'User';
     $function = isset($_GET['f']) ? $_GET['f'] : 'login';
