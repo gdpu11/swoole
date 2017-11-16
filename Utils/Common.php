@@ -13,6 +13,36 @@ use DB\ciku;
  */
 class Common
 {
+
+    public static function getAudioInfoByFile($filePath, &$error='', $upFileName='') {
+        // 获取临时存储文件名
+        $fileSize = filesize($filePath);
+
+        include ROOT_PATH.'Utils'.DIRECTORY_SEPARATOR.'Getid3'.DIRECTORY_SEPARATOR.'getid3.php';
+        $getID3 = new \getID3;
+        $audioInfo = $getID3->analyze($filePath, $fileSize, $upFileName);
+        if (!$audioInfo || isset($audioInfo['error'])) {
+            $error = isset($audioInfo['error'][0]) ? $audioInfo['error'][0] : '';
+            return 0;
+        }
+
+        // 组合返回信息
+        $duration = isset($audioInfo['playtime_seconds']) ? $audioInfo['playtime_seconds'] : 0;
+        $bitrate = isset($audioInfo['audio']) && isset($audioInfo['audio']['bitrate']) ? floor($audioInfo['audio']['bitrate']/1000) : 0;
+        $samplerate = isset($audioInfo['audio']) && isset($audioInfo['audio']['sample_rate']) ? intval($audioInfo['audio']['sample_rate']) : 0;
+        $data = array(
+                'fileSize' => intval($audioInfo['filesize']),
+                'fileType' => strtolower($audioInfo['fileformat']),
+                'duration' => intval($duration*100)/100,
+                'bitrate' => $bitrate,
+                'samplerate' => $samplerate,
+            );
+
+        unset($getID3);
+        unset($audioInfo);
+
+        return $data;
+    }
     /*
     中华字典词库表
     id

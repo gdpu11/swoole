@@ -25,7 +25,7 @@ spl_autoload_register('autoLoad');
 
 $http = new swoole_http_server("127.0.0.1", 9517);
 $http->on('request', function ($request, $response) {
-    print_r($request->get);
+    // print_r($request->get);
     // print_r($request->post);
     // print_r($request->cookie);
     // print_r($request->files);

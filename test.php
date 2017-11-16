@@ -1,4 +1,59 @@
 <?php
+    for ($i = $start, $j = 0; $i <= $limit; $i += $step, $j++) {
+        // 给予键值
+        yield $j => $i;
+    }
+}
+
+$xrange = xrange(1, 10, 2);
+foreach ($xrange as $key => $value) {
+    echo $key . ' => ' . $value . "\n";
+}
+class MyIterator implements Iterator {
+    private $position = 0;
+    private $arr = array (
+        'first', 'second', 'third',
+    );
+    
+    public function __construct() {
+        $this->position = 0;
+    }
+    
+    public function rewind() {
+        var_dump(__METHOD__);
+        $this->position = 0;
+    }
+    
+    public function current() {
+        var_dump(__METHOD__);
+        return $this->arr[$this->position];
+    }
+    
+    public function key() {
+        var_dump(__METHOD__);
+        return $this->position;
+    }
+    
+    public function next() {
+        var_dump(__METHOD__);
+        ++$this->position;
+    }
+    
+    public function valid() {
+        var_dump(__METHOD__);
+        return isset($this->arr[$this->position]);
+    }
+    
+}
+
+$it = new MyIterator();
+
+foreach($it as $key => $value) {
+    echo "\n";
+    print_r($key);
+    print_r($value);
+}
+exit();
 use Utils\RedisUtil;
 use Utils\Common;
 
