@@ -5,8 +5,25 @@ $config = array(
 			'dbHost'=>'localhost',
 			'dbUser'=>'root',
 			'dbName'=>'john_db',
-			'dbPassword'=>'123456',
+			'dbPassword'=>'',
 			'dbPort'=>3306,
-			)
+			),
+	'shares'=>array(
+			'dbType'=>'mysql',
+			'dbHost'=>'localhost',
+			'dbUser'=>'root',
+			'dbName'=>'gupiao',
+			'dbPassword'=>'',
+			'dbPort'=>3306,
+			),
+	'big_data'=>array(
+			'dbType'=>'mysql',
+			'dbHost'=>'localhost',
+			'dbUser'=>'root',
+			'dbName'=>'big_data',
+			'dbPassword'=>'',
+			'dbPort'=>3306,
+			),
 		);
+
 ?>

@@ -34,11 +34,11 @@ class PdoOperateBase
      * @param string $params 对应的数据库配置
      * return false说明给定的数据库不存在
      */
-    public static function getInstance($params = null)
+    public static function getInstance($dbName = null)
     {
-        if (!isset(self::$_instance) || !is_object(self::$_instance)){
-            $params = empty($params)?$GLOBALS['CONFIG']['db']:$params;
-            self::$_instance = self::connect($params);
+        if (!isset(self::$_instance) || !is_object(self::$_instance)|| $dbName){
+            $db = empty($dbName)?$GLOBALS['CONFIG']['db']:$GLOBALS['CONFIG'][$dbName];
+            self::$_instance = self::connect($db);
         }
         return self::$_instance;
     }
@@ -51,6 +51,7 @@ class PdoOperateBase
             return isset(self::$DB_FIELDS[$tbName]);
         }else{
             if (isset($tbName::$SCHEMA)) {
+                $SCHEMA = $tbName::$SCHEMA;
                 if (isset($tbName::$SCHEMA['PARTITION'])) {
                     $tbName = $tbName::$SCHEMA['TABLENAME'].$tbName::$SCHEMA['PARTITION']['suffix'].$tbName::$SCHEMA['PARTITION']['default'];
                 }else{
@@ -59,7 +60,11 @@ class PdoOperateBase
             }else{
                 $tbName = substr($tbName,strripos($tbName,'\\')+1);
             }
-            $pdo = self::getInstance();
+            if (isset($SCHEMA['DBNAME'])) {
+                $pdo = self::getInstance($SCHEMA['DBNAME']);
+            }else{
+                $pdo = self::getInstance();
+            }
             $sql = 'DESC '.$tbName;
             $ps = $pdo->prepare($sql);
             $ps->execute();
@@ -137,7 +142,7 @@ class PdoOperateBase
      * @param  [type] $SCHEMA [表结构]
      * @return [type]         [一行记录]
      */
-    public static function getOne($where,$fields=array(),$ifCache =1) {
+    public static function getOne($where,$fields=array(),$ifCache = 0) {
         if (empty($where)) {
             return false;
         }
@@ -185,7 +190,7 @@ class PdoOperateBase
      * @param  [type] $SCHEMA [表结构]
      * @return [type]          [description]
      */
-    public static function getAll($where = array(),$page=1,$pageszie=20,$fields = array(),$ifCache = 1) {
+    public static function getAll($where = array(),$page=1,$pageszie=20,$fields = array(),$ifCache = 0) {
         self::getTbFields();
         $tbName = self::_getTableName($where);
         $fields = self::_getFieldsStr($fields);
@@ -305,6 +310,22 @@ class PdoOperateBase
     }
 
     /**
+     * [getLastId 获取当前自增id]
+     * @return [type]        [description]
+     */
+    public static function getLastId($where) {
+        self::getTbFields();
+        $tbName = self::_getTableName($where);
+        $sql = 'select  LAST_INSERT_ID() as autoid from "'.$tbName.'"';
+        // $sql = 'select  AUTO_INCREMENT as autoid from information_schema.tables where table_name="'.$tbName.'"';
+        $pdo = self::getInstance();
+        $ps = $pdo->prepare($sql);
+        $ps->execute();
+        $result = $ps->fetch(\PDO::FETCH_ASSOC);
+        return $result['autoid']?:1;
+    }
+
+    /**
      *获取所有联表
      * @author leeqiang@kugou.net
      * @date   2016-12-14
@@ -360,7 +381,7 @@ class PdoOperateBase
         switch ($type) {
             case 'id':
                 // 按照id范围分表
-                $index  = floor($value / $SCHEMA['PARTITION']['num']);
+                $index  = floor($value / $SCHEMA['PARTITION']['num'])+1;
                 return $SCHEMA['TABLENAME'].$SCHEMA['PARTITION']['suffix'].$index;
             case 'year':
                 // 按照年份分表
@@ -368,11 +389,11 @@ class PdoOperateBase
                 return $SCHEMA['TABLENAME'].$SCHEMA['PARTITION']['suffix'].$index;
             case 'mod':
                 // 按照id的模数分表
-                $index = ($value % $SCHEMA['PARTITION']['num']);
+                $index = ($value % $SCHEMA['PARTITION']['num'])+1;
                 return $SCHEMA['TABLENAME'].$SCHEMA['PARTITION']['suffix'].$index;
             case 'md5':
                 // 按照md5的序列分表
-                $index = (ord(substr(md5($value), 0, 1)) % $SCHEMA['PARTITION']['num']);
+                $index = (hexdec(substr(md5($value ), 0, 2)) % $SCHEMA['PARTITION']['num'])+1;
                 return $SCHEMA['TABLENAME'].$SCHEMA['PARTITION']['suffix'].$index;
             default:
                     return $SCHEMA['TABLENAME'];

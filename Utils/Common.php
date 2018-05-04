@@ -2,6 +2,7 @@
 namespace Utils;
 
 use Utils\CurlUtils;
+use Utils\MatrixOperate;
 use Utils\RedisUtil;
 use DB\zidian;
 use DB\cnword;
@@ -14,6 +15,104 @@ use DB\ciku;
 class Common
 {
 
+    /**
+     * [getAudioInfoByFile description]
+     * @param  [type] $filePath   [description]
+     * @param  string &$error     [description]
+     * @param  string $upFileName [description]
+     * @return [type]             [description]
+     */
+    public static function ai($temp) {
+        $Matrix = new MatrixOperate();
+
+        for ($i=5; $i < 10; $i++) { 
+            $x = array();
+            $y = array();
+            $data = $temp;
+
+            //矩阵求解
+            foreach ($data as $key => &$value) {
+                if ($key<$i||!isset($data[$key+1])) {
+                    continue;
+                }
+                $t = array_slice($data, $key-$i,$i);
+                array_unshift($t,1);
+                if (count($t)<$i+1) {
+                    break;
+                }
+                $t1 = $t;
+                foreach ($t1 as $k => &$v) {
+                    if ($k==0) {
+                        continue;
+                    }
+                    array_splice($t, 2*$k, 0, $v*$v);
+                    // array_splice($t, 3*$k, 0, $v*$v*$v);
+                }
+
+                // print_r($t);
+                // exit();
+                // echo count($t)."\r\n";
+                $x[] = $t;
+                $y[] = array($data[$key+1]);
+            }
+            // print_r($x);
+            // print_r($x[1]);
+            // print_r($y[0]);
+            // exit();
+            // exit();
+            $xT = $Matrix->operate($x,'T');
+           
+            $xT_x = $Matrix->operate($xT,'*',$x);
+            // print_r($xT_x);
+            // exit();
+            $xT_x_xIvs = $Matrix->operate($xT_x,'-1');
+
+            $xT_x_xIvs_xT = $Matrix->operate($xT_x_xIvs,'*',$xT);
+
+            $xT_x_xIvs_xT_y = $Matrix->operate($xT_x_xIvs_xT,'*',$y);
+            // print_r($xT_x_xIvs_xT_y);
+            $s = 0;
+            $k = 0;
+
+            for ($j=0; $j+$i < $key+2; $j++) { 
+                $need[0] = array_slice($data, $j,$i);
+                array_unshift($need[0],1);
+                if (count($need[0])<$i+1) {
+                    break;
+                }
+                $t1 = $need[0];
+                foreach ($t1 as $k1 => &$v) {
+                    if ($k1==0) {
+                        continue;
+                    }
+                    array_splice($need[0], 2*$k1, 0, $v*$v);
+                    // array_splice($need[0], 3*$k1, 0, $v*$v*$v);
+                }
+                $num = $Matrix->operate($need,'*',$xT_x_xIvs_xT_y);
+                $num = $num[0][0];
+                if (!isset($data[$j+$i])) {
+                    continue;
+                }
+
+                if (($data[$j+$i]-$data[$j+$i-1]>0&&$num-$data[$j+$i-1]>0)||($data[$j+$i]-$data[$j+$i-1]<0&&$num-$data[$j+$i-1]<0)) {
+                    $k++;
+                }
+                // if (number_format($num,1,'.','')==number_format($data[$j+$i],1,'.','')) {
+                //     $k++;
+                // }
+                
+                $s++;
+            }
+            // print_r($need[0]);
+            echo "num:$num---";
+            echo "s:$s---";
+            echo "k:$k---";
+            echo "i:$i---";
+            $rate = $k/$s*100;
+            echo $rate."%\r\n";
+
+        }
+    }
     public static function getAudioInfoByFile($filePath, &$error='', $upFileName='') {
         // 获取临时存储文件名
         $fileSize = filesize($filePath);
@@ -168,6 +267,22 @@ class Common
         //json_encode()时候，json_decode()出来数据接口会变
         RedisUtil::set($CacheKey,serialize($data),$time);
     }
+
+    public static function scanBlackWords($msg) {
+        if (empty($msg)) {
+            return false;
+        }
+        
+        $url =  'http://musiclib.admin.kugou.com/interface/index.php?m=safety&a=fileNameSafetySearch';
+        $params = array(
+            'fileName'=>$msg,
+            'clientTime'=>time(),
+            );
+
+        $params['token'] = md5("safety:fileNameSafetySearch".$params['clientTime'].$params['fileName']);
+        return CurlUtils::sendGet($url.'&'.http_build_query($params));
+    }
+
 
     /**
      * [filterWildcardChar 过滤通配符]

@@ -312,6 +312,7 @@ class CurlUtils
 	    //没有影响，但是还是有少部分服务器不兼容。本文得出的结论是，在没有需要上传文件的
 	    //情况下，尽量对post提交的数据进行http_build_query，然后发送出去，能实现更好的兼容性，更小的请求数据包。
 	    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+	    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 	    //   执行并获取结果
 	    $output = curl_exec($ch);
         
