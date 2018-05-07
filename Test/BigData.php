@@ -49,7 +49,7 @@ class BigData
 	//php G:\nginx\swoole\cli.php BigData register
 	public static function buildCommentUser(){
 		$test_key = 'big_data:test_key';
-		$id = time()%1000000;
+		$id = rand(1,1000000);
 		// $id = RedisUtil::incr($test_key);
 		$data =  user_comment::getOne(array('id'=>$id),array('id'=>'id'));
 		print_r($data); 
