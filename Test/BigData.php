@@ -13,12 +13,16 @@ use Utils\Common;
 
 class BigData
 {
+	public static function hello(){
+		echo 'hello';exit();
+	}
 	public static function getHash(){
 		$id = rand(1,8388608);
 		echo $id;
 		echo self::myHash($id);
 		exit();
 	}
+
 	public static function myHash($str) {  
 	    // hash(i) = hash(i-1) * 33 + str[i]  
 	    $hash = 0;  
