@@ -13,7 +13,27 @@ use Utils\Common;
 
 class BigData
 {
-
+	public static function getHash(){
+		$id = rand(1,8388608);
+		echo $id;
+		echo self::myHash($id);
+		exit();
+	}
+	public static function myHash($str) {  
+	    // hash(i) = hash(i-1) * 33 + str[i]  
+	    $hash = 0;  
+	    $s    = md5($str);  
+	    $seed = 5;  
+	    $len  = 32;  
+	    for ($i = 0; $i < $len; $i++) {  
+	        // (hash << 5) + hash 相当于 hash * 33  
+	        //$hash = sprintf("%u", $hash * 33) + ord($s{$i});  
+	        //$hash = ($hash * 33 + ord($s{$i})) & 0x7FFFFFFF;  
+	        $hash = ($hash << $seed) + $hash + ord($s{$i});  
+	    }  
+	   
+	    return $hash & 0x7FFFFFFF;  
+	} 
 	//php G:\nginx\swoole\cli.php BigData getuseruid
 	public static function getuseruid(){
 		$test_key = 'big_data:test_key';

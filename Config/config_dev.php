@@ -2,7 +2,7 @@
 $config = array(
 	'db'=>array(
 			'dbType'=>'mysql',
-			'dbHost'=>'localhost',
+			'dbHost'=>'172.19.9.13',
 			'dbUser'=>'root',
 			'dbName'=>'john_db',
 			'dbPassword'=>'',
@@ -10,7 +10,7 @@ $config = array(
 			),
 	'shares'=>array(
 			'dbType'=>'mysql',
-			'dbHost'=>'localhost',
+			'dbHost'=>'172.19.9.13',
 			'dbUser'=>'root',
 			'dbName'=>'gupiao',
 			'dbPassword'=>'',
@@ -18,7 +18,7 @@ $config = array(
 			),
 	'big_data'=>array(
 			'dbType'=>'mysql',
-			'dbHost'=>'localhost',
+			'dbHost'=>'172.19.9.13',
 			'dbUser'=>'root',
 			'dbName'=>'big_data',
 			'dbPassword'=>'',
