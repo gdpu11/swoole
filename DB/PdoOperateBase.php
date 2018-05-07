@@ -36,7 +36,7 @@ class PdoOperateBase
      */
     public static function getInstance($dbName = null)
     {
-        if (!isset(self::$_instance) || !is_object(self::$_instance)|| $dbName){
+        if (!isset(self::$_instance) || !is_object(self::$_instance)){
             $db = empty($dbName)?$GLOBALS['CONFIG']['db']:$GLOBALS['CONFIG'][$dbName];
             self::$_instance = self::connect($db);
         }
