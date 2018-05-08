@@ -11,17 +11,17 @@ class Test
 {
 
 	//php G:\nginx\swoole\cli.php Test scanBlackWords
-	//关注者--粉丝
-	//id
-	// value
-	// 5bi
-	// bushou
-	// bihuashu
-	// chubushoubihuashu
-	// pinyin
-	// intro
-	// detail
-	// %23%7B%7B%5C%22id%5C%22%3A%5C%222%5C%22%2C%5C%22name%5C%22%3A%5C%22%5CU6c34%5CU6bcd%5C%22%7D%7D%23+%5CU89c4%5CU5212
+	public static function hello(){
+        echo 'hello';exit();
+    }
+    
+    public static function getHash(){
+        $id = rand(1,8388608);
+        echo $id;
+        echo self::myHash($id);
+        exit();
+    }
+    
 	public static function post(){
 		foreach ($_POST as $key => &$value) {
 			if (isset($_POST[$key])) {
@@ -44,8 +44,8 @@ class Test
 	        $array[$key] = 0;
 
 	    }
-	    $result = CurlUtils::sendPost('http://2016.5sing.kugou.net/api/songlist/post',$array);
-	    print_r($result);
+	    // $result = CurlUtils::sendPost('http://2016.5sing.kugou.net/api/songlist/post',$array);
+	    // print_r($result);
 	    $endTime = microtime(true);
 	    echo $endTime - $startTime, ' seconds  pid:',getmypid(), "\n";
 	    exit();
@@ -70,11 +70,7 @@ class Test
 	}
 
 	public static function fil(){
-
-
-
 		echo intval(null);exit();
-
 		$item  = '/ss/sss';
 		echo str_replace('/', '-', $item);
 		exit();
